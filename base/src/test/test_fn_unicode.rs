@@ -40,6 +40,7 @@ fn test_error_cases() {
     model._set("A4", "=UNICODE(#VALUE!)");
     model._set("A5", "=UNICODE(#REF!)");
     model._set("A6", "=UNICODE(#DIV/0!)");
+    model._set("A7", "=UNICODE");
 
     model.evaluate();
 
@@ -49,6 +50,7 @@ fn test_error_cases() {
     assert_eq!(model._get_text("A4"), *"#VALUE!");
     assert_eq!(model._get_text("A5"), *"#REF!");
     assert_eq!(model._get_text("A6"), *"#DIV/0!");
+    assert_eq!(model._get_text("A7"), *"#CALC!");
 }
 
 #[test]
