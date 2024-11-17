@@ -122,6 +122,7 @@ pub enum Function {
     Textbefore,
     Textjoin,
     Trim,
+    Unichar,
     Unicode,
     Upper,
     Value,
@@ -247,7 +248,7 @@ pub enum Function {
 }
 
 impl Function {
-    pub fn into_iter() -> IntoIter<Function, 193> {
+    pub fn into_iter() -> IntoIter<Function, 194> {
         [
             Function::And,
             Function::False,
@@ -317,6 +318,7 @@ impl Function {
             Function::Search,
             Function::Text,
             Function::Trim,
+            Function::Unichar,
             Function::Unicode,
             Function::Upper,
             Function::Isnumber,
@@ -462,6 +464,7 @@ impl Function {
             Function::Textbefore => "_xlfn.TEXTBEFORE".to_string(),
             Function::Textafter => "_xlfn.TEXTAFTER".to_string(),
             Function::Textjoin => "_xlfn.TEXTJOIN".to_string(),
+            Function::Unichar => "_xlfn.UNICHAR".to_string(),
             Function::Unicode => "_xlfn.UNICODE".to_string(),
             Function::Rri => "_xlfn.RRI".to_string(),
             Function::Pduration => "_xlfn.PDURATION".to_string(),
@@ -570,6 +573,7 @@ impl Function {
             "SEARCH" => Some(Function::Search),
             "TEXT" => Some(Function::Text),
             "TRIM" => Some(Function::Trim),
+            "UNICHAR" | "_XLFN.UNICHAR" => Some(Function::Unichar),
             "UNICODE" | "_XLFN.UNICODE" => Some(Function::Unicode),
             "UPPER" => Some(Function::Upper),
 
@@ -783,6 +787,7 @@ impl fmt::Display for Function {
             Function::Search => write!(f, "SEARCH"),
             Function::Text => write!(f, "TEXT"),
             Function::Trim => write!(f, "TRIM"),
+            Function::Unichar => write!(f, "UNICHAR"),
             Function::Unicode => write!(f, "UNICODE"),
             Function::Upper => write!(f, "UPPER"),
             Function::Isnumber => write!(f, "ISNUMBER"),
@@ -1017,6 +1022,7 @@ impl Model {
             Function::Search => self.fn_search(args, cell),
             Function::Text => self.fn_text(args, cell),
             Function::Trim => self.fn_trim(args, cell),
+            Function::Unichar => self.fn_unichar(args, cell),
             Function::Unicode => self.fn_unicode(args, cell),
             Function::Upper => self.fn_upper(args, cell),
             // Information

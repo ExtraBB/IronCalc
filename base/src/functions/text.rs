@@ -342,6 +342,80 @@ impl Model {
         CalcResult::new_args_number_error(cell)
     }
 
+    pub(crate) fn fn_unichar(&mut self, args: &[Node], cell: CellReferenceIndex) -> CalcResult {
+        if args.len() == 1 {
+            let parsed_number = match self.evaluate_node_in_context(&args[0], cell) {
+                CalcResult::Number(v) => v as u32,
+                CalcResult::String(v) => match v.parse::<u32>() {
+                    Ok(parsed_v) => parsed_v,
+                    Err(_) => {
+                        return CalcResult::Error {
+                            error: Error::VALUE,
+                            origin: cell,
+                            message: "Cannot parse non-numerical value".to_string(),
+                        }
+                    }
+                },
+                CalcResult::Boolean(true) => 1,
+                CalcResult::Boolean(false) => {
+                    return CalcResult::Error {
+                        error: Error::VALUE,
+                        origin: cell,
+                        message: "Cannot parse false value".to_string(),
+                    };
+                }
+                error @ CalcResult::Error { .. } => return error,
+                CalcResult::Range { .. } => {
+                    // Implicit Intersection not implemented
+                    return CalcResult::Error {
+                        error: Error::NIMPL,
+                        origin: cell,
+                        message: "Implicit Intersection not implemented".to_string(),
+                    };
+                }
+                CalcResult::EmptyCell | CalcResult::EmptyArg => {
+                    return CalcResult::Error {
+                        error: Error::VALUE,
+                        origin: cell,
+                        message: "Empty cell".to_string(),
+                    }
+                }
+            };
+
+            // If outside valid UNICODE range, return VALUE error
+            if parsed_number < 1 || parsed_number > 1114111 {
+                return CalcResult::Error {
+                    error: Error::VALUE,
+                    origin: cell,
+                    message: "Invalid Unicode number".to_string(),
+                };
+            }
+
+            // These are valid UNICODE but Excel doesn't support them
+            if parsed_number == 1114110 || parsed_number == 1114111 {
+                return CalcResult::Error {
+                    error: Error::NA,
+                    origin: cell,
+                    message: "Invalid Unicode number".to_string(),
+                };
+            }
+
+            match char::from_u32(parsed_number) {
+                Some(c) => {
+                    return CalcResult::String(c.to_string());
+                }
+                None => {
+                    return CalcResult::Error {
+                        error: Error::NA,
+                        origin: cell,
+                        message: "Unicode character not available".to_string(),
+                    };
+                }
+            }
+        }
+        CalcResult::new_args_number_error(cell)
+    }
+
     pub(crate) fn fn_unicode(&mut self, args: &[Node], cell: CellReferenceIndex) -> CalcResult {
         if args.len() == 1 {
             let s = match self.evaluate_node_in_context(&args[0], cell) {
