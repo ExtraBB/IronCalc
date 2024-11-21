@@ -591,6 +591,13 @@ impl Parser {
                         return Node::InvalidFunctionKind { name, args };
                     }
                 }
+
+                if next_token == TokenType::EOF {
+                    if let Some(_) = Function::get_function(&name) {
+                        return Node::ErrorKind(token::Error::CALC);
+                    }
+                }
+
                 Node::VariableKind(name)
             }
             TokenType::Error(kind) => Node::ErrorKind(kind),
